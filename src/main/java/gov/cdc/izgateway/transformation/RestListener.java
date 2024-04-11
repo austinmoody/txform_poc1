@@ -1,10 +1,7 @@
 package gov.cdc.izgateway.transformation;
 
 import ca.uhn.hl7v2.model.Message;
-import gov.cdc.izgateway.transformation.services.Hl7ParserService;
 import gov.cdc.izgateway.transformation.services.ProcessorService;
-import gov.cdc.izgateway.transformation.services.SenderService;
-import gov.cdc.izgateway.transformation.services.TransformationService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,16 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Log
 @RestController
-public class TransformationController {
-
-    @Autowired
-    TransformationService transformationService;
+public class RestListener {
 
     @Autowired
     ProcessorService processorService;
-
-    @Autowired
-    Hl7ParserService parserService;
 
     @GetMapping("/transform")
     public String transform() {
