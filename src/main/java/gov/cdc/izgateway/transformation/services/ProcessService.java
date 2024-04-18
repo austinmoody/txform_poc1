@@ -9,7 +9,7 @@ import lombok.extern.java.Log;
 
 @Log
 @Service
-public class ProcessorService {
+public class ProcessService {
 
     /*
     Handle processing of inbound message (transformation, sending)
@@ -24,32 +24,36 @@ public class ProcessorService {
     @Autowired
     Hl7ParserService parserService;
 
-    public Message process(String inboundMessage) throws Exception {
-
+    /*
+    This ultimately should transform the message, send it downstream, and respond to the sender with the response
+    received from the downstream system?
+     */
+    public Message transformAndSend(String inboundMessage) throws Exception {
         Message message = null;
 
         try {
             message = parserService.parse(inboundMessage);
             Message transformedMessage = transformationService.transform(message);
 
-            senderService.send(transformedMessage);
-
-            Message ack = message.generateACK(AcknowledgmentCode.AA, null);
-
-            return ack;
+            return senderService.send(transformedMessage);
 
         } catch (Exception e) {
-            e.printStackTrace();
             log.warning(e.getMessage());
 
             if (message != null) {
                 HL7Exception hl7Exception = new HL7Exception(e.getMessage());
-                Message nak = message.generateACK(AcknowledgmentCode.AE, hl7Exception);
-                return nak;
+                return message.generateACK(AcknowledgmentCode.AE, hl7Exception);
             } else {
                 throw e;
             }
         }
+    }
 
+    /*
+    This will only transform the message and respond to the caller with the transformed message
+     */
+    public Message transformOnly(String inboundMessage) throws Exception {
+        Message message = parserService.parse(inboundMessage);
+        return transformationService.transform(message);
     }
 }
